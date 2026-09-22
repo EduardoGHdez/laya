@@ -4,6 +4,7 @@ require_relative "laya/configuration"
 require_relative "laya/questions"
 require_relative "laya/sequence"
 require_relative "laya/result"
+require_relative "laya/tokenizer"
 
 module Laya
   class << self

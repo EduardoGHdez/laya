@@ -24,10 +24,10 @@ RSpec.describe Laya::Sequence do
       expect(built.ids.last(4)).to eq [2, 105, 105, 2]
     end
 
-    it "serializes a non-String state as JSON" do
+    it "serializes a non-String state as JSON with separators" do
       built = build({a: 1}, {type: :noul, instructions: "is it"})
 
-      expect(built.ids[-2]).to eq 107
+      expect(built.ids[-3..-2]).to eq [105, 102]
     end
 
     it "truncates the state to max_len and keeps the final [SEP]" do
@@ -70,6 +70,19 @@ RSpec.describe Laya::Sequence do
 
       expect(built.markers).to eq [5, 11, 17]
       expect(built.ids.size).to eq 20
+    end
+  end
+
+  describe ".model_json" do
+    it "joins with json.dumps separators at every level" do
+      state = {subject: "返金", n: 3, ok: true, x: nil, tags: ["a", 1], nested: {k: "v"}}
+
+      expect(Laya::Sequence.model_json(state))
+        .to eq '{"subject": "返金", "n": 3, "ok": true, "x": null, "tags": ["a", 1], "nested": {"k": "v"}}'
+    end
+
+    it "serializes empty containers without spaces" do
+      expect(Laya::Sequence.model_json({list: [], hash: {}})).to eq '{"list": [], "hash": {}}'
     end
   end
 

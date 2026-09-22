@@ -12,7 +12,16 @@ module Laya
 
     module_function
 
-    def serialize_state(state) = state.is_a?(String) ? state : JSON.generate(state)
+    def serialize_state(state) = state.is_a?(String) ? state : model_json(state)
+
+    # JSON with json.dumps separators (", " and ": "), the format the model was trained on.
+    def model_json(value)
+      case value
+      when Hash then "{" + value.map { |key, item| "#{JSON.generate(key.to_s)}: #{model_json(item)}" }.join(", ") + "}"
+      when Array then "[" + value.map { |item| model_json(item) }.join(", ") + "]"
+      else JSON.generate(value)
+      end
+    end
 
     def build(encode, special_ids, state, question, max_len:, head_max_len:)
       scrub = ->(text) { text.gsub(special_ids.mask_token, " ") }
