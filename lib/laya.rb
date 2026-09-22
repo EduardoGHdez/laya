@@ -3,6 +3,7 @@ require_relative "laya/errors"
 require_relative "laya/configuration"
 require_relative "laya/questions"
 require_relative "laya/sequence"
+require_relative "laya/result"
 
 module Laya
   class << self
