@@ -10,8 +10,12 @@ Gem::Specification.new do |spec|
   spec.description = "Typed decisions (choice, score, noul) with calibrated probabilities in one forward pass. " \
     "A Ruby port of @receptron/laya on top of the onnxruntime and tokenizers gems."
   spec.license = "MIT"
-  spec.required_ruby_version = ">= 3.2"
+  spec.homepage = "https://github.com/EduardoGHdez/laya"
+  spec.required_ruby_version = ">= 3.3"
   spec.metadata["rubygems_mfa_required"] = "true"
+  spec.metadata["source_code_uri"] = "https://github.com/EduardoGHdez/laya"
+  spec.metadata["changelog_uri"] = "https://github.com/EduardoGHdez/laya/blob/main/CHANGELOG.md"
+  spec.metadata["bug_tracker_uri"] = "https://github.com/EduardoGHdez/laya/issues"
 
   spec.files = Dir["lib/**/*.rb", "exe/*", "README.md", "LICENSE.txt", "CHANGELOG.md"]
   spec.bindir = "exe"

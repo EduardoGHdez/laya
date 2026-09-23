@@ -31,7 +31,7 @@ result[:churn_risk].noul    # => 0.0988
 gem "laya"
 ```
 
-This requires Ruby 3.2+. The runtime dependencies are [`onnxruntime`](https://github.com/ankane/onnxruntime-ruby) and [`tokenizers`](https://github.com/ankane/tokenizers-ruby), which ship prebuilt binaries.
+This requires Ruby 3.3+. The runtime dependencies are [`onnxruntime`](https://github.com/ankane/onnxruntime-ruby) and [`tokenizers`](https://github.com/ankane/tokenizers-ruby), which ship prebuilt binaries.
 
 The model itself is about 1.7 GB, published at [receptron/laya-onnx](https://huggingface.co/receptron/laya-onnx). It downloads on first use into `~/.cache/receptron-laya`, so a machine running both downloads it only once. You can also fetch it ahead of time; see [Downloading the model](#downloading-the-model). Budget about 2 GB of RAM once it's loaded.
 
