@@ -36,3 +36,5 @@ module Laya
     end
   end
 end
+
+require_relative "laya/railtie" if defined?(Rails::Railtie)
