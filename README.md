@@ -1,4 +1,8 @@
-# laya
+# Laya
+
+[![Gem Version](https://img.shields.io/gem/v/laya)](https://rubygems.org/gems/laya)
+[![Ruby](https://img.shields.io/badge/ruby-%3E%3D%203.3-CC342D?logo=ruby)](https://www.ruby-lang.org)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.txt)
 
 Run [Laya](https://laya.convaiinnovations.com/), Convai Innovations' open-source "System-1" decision model, from Ruby. It runs locally on the CPU through ONNX Runtime.
 
