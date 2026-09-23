@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    laya (0.1.0)
+    laya (0.2.0)
       onnxruntime (~> 0.11)
       tokenizers (~> 0.7)
 
@@ -136,7 +136,7 @@ CHECKSUMS
   hashdiff (1.2.1) sha256=9c079dbc513dfc8833ab59c0c2d8f230fa28499cc5efb4b8dd276cf931457cd1
   json (2.21.2) sha256=1f1d3b7cf2b3ba1a69beca0bb6db13d5438b80bff3cd54cdaaa620b9b07c1c6a
   language_server-protocol (3.17.0.6) sha256=5ef2c0c138f8267e1bc631d3328347d354f96724b0af22f2c79516120443b7f0
-  laya (0.1.0)
+  laya (0.2.0)
   lint_roller (1.1.0) sha256=2c0c845b632a7d172cb849cc90c1bce937a28c5c8ccccb50dfd46a485003cc87
   onnxruntime (0.11.7-aarch64-linux) sha256=1102178e66ce876b223c5708110b5f4d768c97ba15ad6a4cbc89745025f9d70e
   onnxruntime (0.11.7-arm64-darwin) sha256=802b5de13fbb91b6fcd20a6e45efbab80a84f222f0db02e65fd48e3078ac9099

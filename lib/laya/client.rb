@@ -21,7 +21,7 @@ module Laya
       nil
     end
 
-    def system_one(state, questions)
+    def predict(state, questions)
       normalized_questions = Questions.normalize_all(questions)
       model = session
       encoded = {}
@@ -49,6 +49,7 @@ module Laya
         usage: Usage.new(input_tokens: rows.sum { |built, _| built.ids.size }, output_tokens: 0)
       )
     end
+    alias_method :system_one, :predict
 
     private
 

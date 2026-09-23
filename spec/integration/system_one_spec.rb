@@ -1,6 +1,6 @@
 RSpec.describe "Laya against the reference output", :model do
   # Loading the 1.7 GB model takes seconds, so every example shares one answer
-  before(:context) { @result = Laya.new(model_dir: ENV.fetch("LAYA_MODEL_DIR")).system_one(state, questions) }
+  before(:context) { @result = Laya.new(model_dir: ENV.fetch("LAYA_MODEL_DIR")).predict(state, questions) }
 
   let(:result) { @result }
 

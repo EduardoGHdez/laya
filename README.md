@@ -12,18 +12,17 @@ You give Laya a **state** (a ticket, an email, any JSON) and some **typed questi
 ```ruby
 laya = Laya.new
 
-result = laya.system_one(
-  {
-    subject: "Refund not received",
-    body: "I cancelled my subscription two weeks ago and I still have not received my refund. " \
-      "This is the third time I am writing. If this is not resolved I will dispute the charge with my bank."
-  },
-  {
-    department: {type: :choice, instructions: "Which team should handle this ticket?",
-                 criteria: {billing: "payments, refunds, invoices", support: "product help and bugs", sales: "new purchases"}},
-    churn_risk: {type: :noul, instructions: "Is the customer likely to cancel or dispute?"}
-  }
-)
+ticket = {
+  subject: "Refund not received",
+  body: "I cancelled my subscription two weeks ago and I still have not received my refund. " \
+    "This is the third time I am writing. If this is not resolved I will dispute the charge with my bank."
+}
+
+result = laya.predict(ticket, {
+  department: {type: :choice, instructions: "Which team should handle this ticket?",
+               criteria: {billing: "payments, refunds, invoices", support: "product help and bugs", sales: "new purchases"}},
+  churn_risk: {type: :noul, instructions: "Is the customer likely to cancel or dispute?"}
+})
 
 result[:department].choice  # => "billing"
 result[:churn_risk].noul    # => 0.0988
@@ -42,14 +41,14 @@ The model itself is about 1.7 GB, published at [receptron/laya-onnx](https://hug
 
 ## Asking questions
 
-`system_one(state, questions)` answers every question about one state in a single forward pass.
+`predict(state, questions)` answers every question about one state in a single forward pass.
 
 - **`state`** is a String, or anything JSON-serializable (Hash, Array, numbers). Long states are truncated to the model's 512-token window.
 - **`questions`** is a Hash of `name => question`. Names and `type` can be Symbols or Strings, and the answers come back under the same keys.
 
 ### The three question types
 
-The `choice` and `score` examples below use the ticket state from the top of this README.
+The `choice` and `score` examples below use `laya` and `ticket` from the top of this README.
 
 | Type | Use it for | `criteria` | Answer |
 | --- | --- | --- | --- |
@@ -60,42 +59,47 @@ The `choice` and `score` examples below use the ticket state from the top of thi
 **choice** picks the most likely label and gives the probability of each one:
 
 ```ruby
-department: {
-  type: :choice,
-  instructions: "Which team should handle this ticket?",
-  criteria: {billing: "payments, refunds, invoices", support: "product help and bugs", sales: "new purchases"}
-}
-# result[:department].choice        # => "billing"
-# result[:department].probabilities # => {"billing" => 0.9415, "support" => 0.031, "sales" => 0.0275}
-# result[:department].confidence    # => 0.7603 (1 = certain, 0 = evenly spread)
+result = laya.predict(ticket, {
+  department: {
+    type: :choice,
+    instructions: "Which team should handle this ticket?",
+    criteria: {billing: "payments, refunds, invoices", support: "product help and bugs", sales: "new purchases"}
+  }
+})
+
+result[:department].choice        # => "billing"
+result[:department].probabilities # => {"billing" => 0.9415, "support" => 0.031, "sales" => 0.0275}
+result[:department].confidence    # => 0.7603 (1 = certain, 0 = evenly spread)
 ```
 
 **score** returns the expected level, from 0 up to the number of levels minus 1, plus the distribution:
 
 ```ruby
-urgency: {
-  type: :score,
-  instructions: "How urgent is this ticket?",
-  criteria: ["not urgent", "somewhat urgent", "urgent", "critical"]
-}
-# result[:urgency].score         # => 1.3886 (between "somewhat urgent" and "urgent")
-# result[:urgency].probabilities # => {"0" => 0.1752, "1" => 0.2947, "2" => 0.4962, "3" => 0.0338}
-# result[:urgency].legend        # => {"0" => "not urgent", "1" => "somewhat urgent", ...}
+result = laya.predict(ticket, {
+  urgency: {
+    type: :score,
+    instructions: "How urgent is this ticket?",
+    criteria: ["not urgent", "somewhat urgent", "urgent", "critical"]
+  }
+})
+
+result[:urgency].score         # => 1.3886 (between "somewhat urgent" and "urgent")
+result[:urgency].probabilities # => {"0" => 0.1752, "1" => 0.2947, "2" => 0.4962, "3" => 0.0338}
+result[:urgency].legend        # => {"0" => "not urgent", "1" => "somewhat urgent", ...}
 ```
 
 **noul** returns P(true). The criteria are optional and let you say what true and false mean:
 
 ```ruby
-laya.system_one(
-  "Hi, my order #4521 arrived damaged, can I get a replacement?",
-  {
-    spam: {
-      type: :noul,
-      instructions: "Is this message spam?",
-      criteria: {true => "unsolicited advertising", false => "a genuine request"}
-    }
+result = laya.predict("Hi, my order #4521 arrived damaged, can I get a replacement?", {
+  spam: {
+    type: :noul,
+    instructions: "Is this message spam?",
+    criteria: {true => "unsolicited advertising", false => "a genuine request"}
   }
-)[:spam].noul # => 0.1134
+})
+
+result[:spam].noul # => 0.1134
 ```
 
 Every answer also has `type` and `act_probability`. `result.usage.input_tokens` reports how many tokens were read, and `result.to_h` returns a plain Hash.
@@ -135,7 +139,7 @@ end
 
 ### Loading and threads
 
-`Laya.new` is cheap: the model loads on the first `system_one` call. To load it up front, call `load!`:
+`Laya.new` is cheap: the model loads on the first `predict` call. To load it up front, call `load!`:
 
 ```ruby
 LAYA = Laya.new.load!

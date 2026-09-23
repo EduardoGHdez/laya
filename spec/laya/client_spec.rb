@@ -56,8 +56,8 @@ RSpec.describe Laya::Client do
     )
   end
 
-  describe "#system_one" do
-    subject(:result) { Laya::Client.new(config, session: session).system_one({ticket: "refund please"}, questions) }
+  describe "#predict" do
+    subject(:result) { Laya::Client.new(config, session: session).predict({ticket: "refund please"}, questions) }
 
     it "runs every question in one forward pass" do
       result
@@ -113,7 +113,7 @@ RSpec.describe Laya::Client do
     it "keeps the caller's keys" do
       client = Laya::Client.new(config, session: session)
 
-      result = client.system_one("state", questions.transform_keys(&:to_s))
+      result = client.predict("state", questions.transform_keys(&:to_s))
 
       expect(result.answers.keys).to eq %w[department urgency churn]
     end
@@ -121,15 +121,21 @@ RSpec.describe Laya::Client do
     it "raises InputTooLongError when options don't fit in max_len" do
       client = Laya::Client.new(config, session: FakeSession.new(logits: [], act_probs: [], max_len: 8))
 
-      expect { client.system_one("state", questions) }
+      expect { client.predict("state", questions) }
         .to raise_error(Laya::InputTooLongError, "question :department: options do not fit in head_max_len=192 tokens")
     end
 
     it "validates questions before loading the model" do
       client = Laya::Client.new(config)
 
-      expect { client.system_one("state", {}) }.to raise_error(Laya::InvalidQuestionError)
+      expect { client.predict("state", {}) }.to raise_error(Laya::InvalidQuestionError)
       expect(client).not_to be_loaded
+    end
+  end
+
+  describe "#system_one" do
+    it "is an alias of #predict" do
+      expect(Laya::Client.instance_method(:system_one)).to eq Laya::Client.instance_method(:predict)
     end
   end
 

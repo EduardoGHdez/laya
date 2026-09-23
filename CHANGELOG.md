@@ -1,6 +1,10 @@
 # Changelog
 
-## 0.1.0 (unreleased)
+## 0.2.0
+
+- `Laya::Client#predict` is now the primary name for running a question; `#system_one` remains as an alias
+
+## 0.1.0
 
 - `Laya.configure`, `Laya.new` and `Laya::Client#system_one` for `choice`, `score` and `noul` questions
 - Lazy, thread-safe model loading, with `load!` for preloading before fork

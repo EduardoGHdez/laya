@@ -1,6 +1,6 @@
 RSpec.describe Laya do
   it "has a version" do
-    expect(Laya::VERSION).to eq "0.1.0"
+    expect(Laya::VERSION).to eq "0.2.0"
   end
 
   it "roots every error at Laya::Error" do
