@@ -8,6 +8,7 @@ require_relative "laya/tokenizer"
 require_relative "laya/session"
 require_relative "laya/downloader"
 require_relative "laya/client"
+require_relative "laya/cli"
 
 module Laya
   class << self

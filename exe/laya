@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+require "laya"
+
+exit Laya::CLI.new.run(ARGV)
