@@ -11,7 +11,7 @@ module Laya
     ORIGIN = URI("https://huggingface.co")
     MAX_REDIRECTS = 5
     NETWORK_ERRORS = [SocketError, SystemCallError, IOError, Timeout::Error,
-                      OpenSSL::SSL::SSLError, Net::HTTPBadResponse].freeze
+      OpenSSL::SSL::SSLError, Net::HTTPBadResponse].freeze
 
     def initialize(config)
       @config = config

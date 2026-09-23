@@ -5,6 +5,7 @@ require_relative "laya/questions"
 require_relative "laya/sequence"
 require_relative "laya/result"
 require_relative "laya/tokenizer"
+require_relative "laya/session"
 require_relative "laya/downloader"
 
 module Laya
