@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Starts Showdown on port 8000. --no-security lets bots pick a name without logging in (local use only).
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+[ -f vendor/pokedex.json ] || { echo "Run bin/setup first." >&2; exit 1; }
+cd vendor/pokemon-showdown
+exec node pokemon-showdown start --no-security --skip-build 8000

@@ -1,0 +1,99 @@
+#!/usr/bin/env ruby
+# Plays Gen 9 Random Battles on a local Showdown server with Laya deciding every turn.
+#
+#   bin/server             # in another terminal
+#   bin/play --battles 10
+#   bin/play --human       # then challenge LayaBot at http://localhost:8000
+ENV["BUNDLE_GEMFILE"] ||= File.expand_path("../Gemfile", __dir__)
+require "bundler/setup"
+require "optparse"
+require_relative "../lib/player"
+require_relative "../lib/pokedex"
+require_relative "../lib/scoreboard"
+require_relative "../lib/showdown_client"
+require_relative "../lib/trainer"
+
+# async-pool logs a harmless ThreadError warning whenever a WebSocket connection closes.
+Console.logger.level = :error
+
+options = {battles: 1, human: false, server: ShowdownClient::DEFAULT_URL, max_turns: 300, quiet: false}
+OptionParser.new do |parser|
+  parser.banner = "Usage: bin/play [--battles N | --human] [options]"
+  parser.on("--battles N", Integer, "Battles against LayaRival (default 1)") { |n| options[:battles] = n }
+  parser.on("--human", "Wait for challenges at http://localhost:8000 instead") { options[:human] = true }
+  parser.on("--server URL", "Showdown WebSocket URL (default #{ShowdownClient::DEFAULT_URL})") { |url| options[:server] = url }
+  parser.on("--max-turns N", Integer, "Forfeit a battle after N turns (default 300)") { |n| options[:max_turns] = n }
+  parser.on("--quiet", "Print only each battle's result and the summary") { options[:quiet] = true }
+end.parse!
+
+# Logs in as LayaRival and challenges LayaBot again after each battle, `battles` times in all.
+def play_rival(server, trainer:, battles:, max_turns:)
+  ShowdownClient.open(server, "LayaRival") do |client|
+    challenges_left = battles
+    challenge = lambda do
+      challenges_left -= 1
+      client.challenge("LayaBot", Player::FORMAT)
+    end
+
+    player = Player.new(
+      client: client,
+      trainer: trainer,
+      max_turns: max_turns,
+      on_finish: ->(_result) { challenge.call if challenges_left.positive? }
+    )
+
+    challenge.call
+
+    client.each_frame { |room, lines| player.handle(room, lines) }
+  end
+end
+
+abort "Run bin/setup first." unless File.exist?(Pokedex::DEFAULT_PATH)
+
+warn "Loading Laya..."
+laya = begin
+  Laya.new.load!
+rescue Laya::Error => e
+  abort "Laya couldn't load: #{e.message}"
+end
+
+# LayaBot and LayaRival share this trainer, and so one loaded model: it keeps no state between decisions.
+trainer = Trainer.new(laya:, pokedex: Pokedex.load)
+scoreboard = Scoreboard.new
+laya_player = nil
+
+begin
+  Sync do |task|
+    ShowdownClient.open(options[:server], "LayaBot") do |client|
+      laya_player = Player.new(client:, trainer:, accept_from: options[:human] ? :anyone : "LayaRival",
+        max_turns: options[:max_turns], out: options[:quiet] ? nil : $stdout, on_finish: scoreboard.method(:record))
+
+      if options[:human]
+        puts "LayaBot is waiting. Open http://localhost:8000 and challenge LayaBot to Gen 9 Random Battle."
+      else
+        puts "Playing #{options[:battles]} battle(s) against LayaRival..."
+        opponent = task.async do
+          play_rival(options[:server], trainer:, battles: options[:battles], max_turns: options[:max_turns])
+        rescue => e
+          # Console.logger is silenced above, so a dead task would otherwise hang the run with no explanation.
+          warn "LayaRival stopped: #{e.message}"
+          task.stop
+        end
+      end
+
+      client.each_frame do |room, lines|
+        laya_player.handle(room, lines)
+        break if !options[:human] && scoreboard.size >= options[:battles]
+      end
+      opponent&.stop
+    end
+  end
+rescue Errno::ECONNREFUSED
+  abort "Can't reach #{options[:server]}. Start the server first: bin/server"
+rescue ShowdownClient::Error => e
+  abort e.message
+rescue Interrupt
+  puts
+ensure
+  puts scoreboard.summary(switch_rate: laya_player.switch_rate) if laya_player
+end

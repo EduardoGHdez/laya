@@ -1,0 +1,22 @@
+{
+  "moves": {
+    "earthquake": {"name": "Earthquake", "type": "Ground", "category": "Physical", "basePower": 100, "accuracy": 100, "shortDesc": "Hits adjacent Pokemon. Double damage on Dig."},
+    "dragonclaw": {"name": "Dragon Claw", "type": "Dragon", "category": "Physical", "basePower": 80, "accuracy": 100, "shortDesc": "No additional effect."},
+    "swordsdance": {"name": "Swords Dance", "type": "Normal", "category": "Status", "basePower": 0, "accuracy": true, "shortDesc": "Raises the user's Attack by 2."},
+    "thunderbolt": {"name": "Thunderbolt", "type": "Electric", "category": "Special", "basePower": 90, "accuracy": 100, "shortDesc": "10% chance to paralyze the target."},
+    "waterfall": {"name": "Waterfall", "type": "Water", "category": "Physical", "basePower": 80, "accuracy": 100, "shortDesc": "20% chance to make the target flinch."},
+    "return": {"name": "Return", "type": "Normal", "category": "Physical", "basePower": 0, "accuracy": 100, "shortDesc": "Max 102 power at maximum Happiness."}
+  },
+  "species": {
+    "garchomp": {"name": "Garchomp", "types": ["Dragon", "Ground"]},
+    "rotomwash": {"name": "Rotom-Wash", "types": ["Electric", "Water"]},
+    "gyarados": {"name": "Gyarados", "types": ["Water", "Flying"]},
+    "pikachu": {"name": "Pikachu", "types": ["Electric"]}
+  },
+  "effectiveness": {
+    "Ground": {"Flying": 0, "Electric": 2},
+    "Electric": {"Ground": 0, "Water": 2, "Flying": 2, "Dragon": 0.5, "Electric": 0.5},
+    "Water": {"Ground": 2, "Water": 0.5, "Dragon": 0.5},
+    "Dragon": {"Dragon": 2}
+  }
+}

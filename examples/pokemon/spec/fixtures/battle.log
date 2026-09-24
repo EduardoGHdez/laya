@@ -1,0 +1,35 @@
+|player|p1|LayaBot|1|
+|player|p2|RandomBot|2|
+|teamsize|p1|6
+|teamsize|p2|6
+|gen|9
+|tier|[Gen 9] Random Battle
+|start
+|switch|p1a: Garchomp|Garchomp, L78, F|250/250
+|switch|p2a: Rotom|Rotom-Wash, L86|100/100
+|turn|1
+|move|p1a: Garchomp|Swords Dance|p1a: Garchomp
+|-boost|p1a: Garchomp|atk|2
+|move|p2a: Rotom|Will-O-Wisp|p1a: Garchomp
+|-status|p1a: Garchomp|brn
+|-damage|p1a: Garchomp|219/250 brn|[from] brn
+|upkeep
+|turn|2
+|move|p2a: Rotom|Hydro Pump|p1a: Garchomp
+|-damage|p1a: Garchomp|60/250 brn
+|move|p1a: Garchomp|Dragon Claw|p2a: Rotom
+|-damage|p2a: Rotom|45/100
+|-curestatus|p1: Gyarados|par|[msg]
+|-damage|p1a: Garchomp|29/250 brn|[from] brn
+|upkeep
+|turn|3
+|move|p2a: Rotom|Hydro Pump|p1a: Garchomp
+|-damage|p1a: Garchomp|0 fnt
+|faint|p1a: Garchomp
+|upkeep
+|switch|p1a: Gyarados|Gyarados, L80, M|300/300
+|turn|4
+|move|p1a: Gyarados|Waterfall|p2a: Rotom
+|-damage|p2a: Rotom|0 fnt
+|faint|p2a: Rotom
+|win|LayaBot

@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# Fetches Pokémon Showdown at a pinned commit, builds it, and exports its data to vendor/pokedex.json.
+set -euo pipefail
+
+cd "$(dirname "$0")/.."
+commit=a5df8274e85b0889bf2a9b3422a08b39732374fc
+dir=vendor/pokemon-showdown
+
+if ! command -v node >/dev/null; then
+  echo "node not found. Install Node.js 22 or later first: brew install node" >&2
+  exit 1
+fi
+if [ "$(node -p 'process.versions.node.split(".")[0]')" -lt 22 ]; then
+  echo "Node.js 22 or later is required (found $(node --version))." >&2
+  exit 1
+fi
+
+if [ ! -d "$dir/.git" ]; then
+  git init --quiet "$dir"
+  git -C "$dir" remote add origin https://github.com/smogon/pokemon-showdown
+fi
+git -C "$dir" fetch --quiet --depth 1 origin "$commit"
+git -C "$dir" checkout --quiet --force FETCH_HEAD
+(cd "$dir" && npm install --no-audit --no-fund && node build)
+
+# Turn off Showdown's admin REPL: its unix socket paths under this checkout exceed macOS's
+# 104-byte limit and crash the server at startup.
+config="$dir/config/config.js" node -e '
+  const fs = require("fs");
+  const file = process.env.config;
+  const text = fs.readFileSync(file, "utf8");
+  if (!text.includes("exports.repl = false;")) {
+    const patched = text.replace("exports.repl = true;", "exports.repl = false;");
+    if (patched === text) throw new Error(`exports.repl = true; not found in ${file}`);
+    fs.writeFileSync(file, patched);
+  }
+'
+
+node export_pokedex.js
+bundle install
